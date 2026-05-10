@@ -1,5 +1,6 @@
 #!/bin/bash
 # Link XPU skills into a PyTorch workspace so Copilot/Claude can discover them.
+# This remains the manual fallback when plugin marketplace installation is not used.
 # Usage: ./setup.sh /path/to/pytorch
 PYTORCH_DIR="${1:-.}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

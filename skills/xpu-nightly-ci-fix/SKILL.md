@@ -127,7 +127,7 @@ For each failure, determine the root cause category:
 spin fixlint
 ```
 analysis the output log and fix the linting issues
-- Stage and commit changes, commit message need to include title: [fix][xpu] xxxxx , ## Motivation, ## Solution, ## Test plan.
+- Stage and commit changes, commit message need to include title: [xpu][fix] xxxxx , ## Motivation, ## Solution, ## Test plan.
 
 
 ## Environment
@@ -139,9 +139,12 @@ analysis the output log and fix the linting issues
 ## Best Practices
 
 - Always reproduce before fixing
+- **After fixing, run EVERY failing test case from the report individually to verify it passes.** Do not skip any case or assume that verifying one representative case is sufficient. Run all cases explicitly, batch by batch if needed, and confirm each one passes.
 - Match upstream CUDA tolerances when adjusting XPU tolerances
 - Remove unused imports when removing skip decorators
 - Keep commits focused: one fix per commit
+- **Never cherry-pick** upstream fixes into the fix branch. If a fix already landed on trunk after the CI commit, rebase the fix branch onto the latest trunk (`git rebase origin/main`) instead.
+- **Always rebuild after rebase or branch switch.** After `git rebase`, `git checkout`, or any operation that changes the commit base, you MUST rebuild (`source .env && pip install -e . -v --no-build-isolation`) before running any tests. Without rebuilding, the installed C++ extensions and generated code are stale and test results are **completely unreliable** — they may segfault, produce wrong pass/fail results, or mask real issues. Never trust test results from a stale build.
 - Editable installs resolve Python from source but C++ headers from the installed location (`torch/include/`). After editing a C++ header, **manually copy** it to the installed include path.
 - Delete the PCH cache (`/tmp/torchinductor_<user_name>/precompiled_headers/`) after modifying any header under `torch/csrc/inductor/cpp_wrapper/` — stale precompiled headers mask the fix.
 - For C++ compile errors in AOT Inductor generated code (`CppCompileError`), read the generated `.wrapper.cpp` error message carefully — the root cause is usually in the **codegen ordering** in `cpp_wrapper_cpu.py` (e.g. a function used before its definition is emitted). Check `write_wrapper_decl()` and `generate_input_output_runtime_checks()` ordering.

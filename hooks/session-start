@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+session_context="<IMPORTANT>\nYou have access to the torch-xpu-skills plugin.\n\nAvailable skill:\n- xpu-nightly-ci-fix: Analyze nightly CI failures for PyTorch XPU, reproduce locally, identify root causes, and apply minimal fixes.\n\nUse the native Skill tool when the user shares nightly failure reports, failing XPU test cases, or requests XPU CI triage.\n\nPlugin root: ${PLUGIN_ROOT}\n</IMPORTANT>"
+
+escape_for_json() {
+    local text="$1"
+    text="${text//\\/\\\\}"
+    text="${text//\"/\\\"}"
+    text="${text//$'\n'/\\n}"
+    text="${text//$'\r'/\\r}"
+    text="${text//$'\t'/\\t}"
+    printf '%s' "$text"
+}
+
+escaped_context="$(escape_for_json "$session_context")"
+
+if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
+    printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$escaped_context"
+else
+    printf '{\n  "additionalContext": "%s"\n}\n' "$escaped_context"
+fi
+
+exit 0

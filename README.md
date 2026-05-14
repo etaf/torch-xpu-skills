@@ -2,7 +2,7 @@
 
 GitHub Copilot / Claude agent skills for XPU backend development in PyTorch.
 
-These skills are **not upstreamed** to `pytorch/pytorch` because they are XPU-specific. This repository is now shaped like a plugin repository so it can be published through a plugin marketplace, while still supporting the original symlink-based setup as a fallback.
+These skills are **not upstreamed** to `pytorch/pytorch` because they are XPU-specific. This repository is packaged as a [GitHub Copilot CLI plugin](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-creating), while still supporting the original symlink-based setup as a fallback.
 
 ## Skills
 
@@ -12,23 +12,46 @@ These skills are **not upstreamed** to `pytorch/pytorch` because they are XPU-sp
 
 ## Installation
 
-### GitHub Copilot CLI via marketplace
+### Install as a Copilot CLI plugin (recommended)
 
-Target install flow:
+Install from a local clone:
 
 ```bash
-copilot plugin marketplace add obra/superpowers-marketplace
-copilot plugin install superpowers@superpowers-marketplace
+git clone git@github.com:xinanlin/torch-xpu-skills.git
+copilot plugin install ./torch-xpu-skills
 ```
 
-For this repository, the important part is plugin packaging compatibility: it now includes standard plugin metadata under `.claude-plugin/` plus a SessionStart hook under `hooks/` so a marketplace catalog can point at this repository directly.
+Verify:
 
-To make the exact two commands above install this plugin, a marketplace entry still needs to be added in the catalog repository that users register with `copilot plugin marketplace add`.
+```bash
+copilot plugin list
+```
+
+To pick up changes after updating the repo, re-install:
+
+```bash
+copilot plugin install ./torch-xpu-skills
+```
+
+To uninstall:
+
+```bash
+copilot plugin uninstall torch-xpu-skills
+```
+
+### Install via marketplace
+
+If a marketplace catalog includes this plugin:
+
+```bash
+copilot plugin marketplace add <marketplace-owner>/<marketplace-repo>
+copilot plugin install torch-xpu-skills@<marketplace-name>
+```
 
 ### Manual setup fallback
 
 ```bash
-git clone git@github.com:<you>/torch-xpu-skills.git
+git clone git@github.com:xinanlin/torch-xpu-skills.git
 ./torch-xpu-skills/setup.sh /path/to/pytorch
 ```
 
@@ -36,7 +59,7 @@ This creates symlinks under `pytorch/.claude/skills/` pointing back to this repo
 
 ## Usage
 
-After installation, the agent should automatically discover the plugin skills. Right now this repository exposes:
+After installation, the plugin skills are automatically discovered. This plugin exposes:
 
 - `xpu-nightly-ci-fix` for XPU nightly CI triage and repair workflows
 
@@ -53,5 +76,6 @@ Please investigate these failing XPU tests from nightly CI and fix the root caus
 ## Adding a new skill
 
 1. Create `skills/<skill-name>/SKILL.md` with YAML frontmatter (`name`, `description`) and workflow content.
-2. If you use manual symlinks, run `./setup.sh /path/to/pytorch` again — existing links are skipped, new ones are created.
-3. If you use plugin marketplace install, bump the plugin version in `.claude-plugin/plugin.json` before publishing the updated plugin or marketplace entry.
+2. Bump the version in `plugin.json`.
+3. If using manual symlinks, run `./setup.sh /path/to/pytorch` again — existing links are skipped, new ones are created.
+4. If installed as a plugin, re-install: `copilot plugin install ./torch-xpu-skills`.

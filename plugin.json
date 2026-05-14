@@ -1,0 +1,21 @@
+{
+  "name": "torch-xpu-skills",
+  "description": "XPU-specific PyTorch agent skills for nightly CI triage and backend debugging",
+  "version": "0.1.0",
+  "author": {
+    "name": "xinanlin"
+  },
+  "homepage": "https://github.com/etaf/torch-xpu-skills",
+  "repository": "https://github.com/etaf/torch-xpu-skills",
+  "license": "MIT",
+  "keywords": [
+    "pytorch",
+    "xpu",
+    "ci",
+    "nightly",
+    "debugging",
+    "skills"
+  ],
+  "skills": "skills/",
+  "hooks": "hooks/hooks.json"
+}
